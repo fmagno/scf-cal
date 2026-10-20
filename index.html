@@ -142,6 +142,54 @@
     box-shadow: 0 4px 14px rgba(0,0,0,.08);
   }
   a.gcal span { font-size: 1rem; line-height: 1; }
+  #games {
+    width: min(34rem, 100%);
+    margin-top: .75rem;
+  }
+  #games h2 {
+    margin: 0 0 .65rem;
+    font-size: .95rem;
+    font-weight: 400;
+    text-align: center;
+  }
+  #games ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+  }
+  #games a.game, #games .msg {
+    display: flex;
+    gap: .9rem;
+    align-items: center;
+    padding: .7rem .9rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: .65rem;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  #games a.game:hover {
+    border-color: var(--muted);
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  }
+  #games .msg {
+    justify-content: center;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  #games .when {
+    flex: none;
+    width: 4.75rem;
+    text-align: center;
+  }
+  #games .when .d { display: block; font-size: .8rem; }
+  #games .when .t { display: block; font-size: .65rem; color: var(--muted); }
+  #games .who { font-size: .8rem; line-height: 1.35; }
+  #games .meta { font-size: .65rem; color: var(--muted); line-height: 1.35; }
 </style>
 </head>
 <body>
@@ -165,6 +213,11 @@
     <span aria-hidden="true">🗓️</span>
     Add to Google Calendar
   </a>
+
+  <section id="games">
+    <h2>Upcoming games</h2>
+    <ul id="games-list"><li class="msg">Loading…</li></ul>
+  </section>
   </main>
 
   <div id="toast" role="status" aria-live="polite">Link copied!</div>
@@ -195,7 +248,103 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("show"), 2000);
   });
-  </script>
+
+  // ---- upcoming games, parsed from the same farense.ics that is subscribed ----
+  const gamesList = document.getElementById("games-list");
+
+  function unescapeICS(v) {
+    return v.replace(/\\n/g, "\n").replace(/\\([\\;,])/g, "$1");
+  }
+
+  function parseEvents(text) {
+    const lines = text.replace(/\r\n[ \t]/g, "").replace(/\r[ \t]/g, "").split("\n");
+    const events = [];
+    let cur = null;
+    for (const raw of lines) {
+      const line = raw.replace(/\r$/, "");
+      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
+      if (line === "END:VEVENT") { if (cur) events.push(cur); cur = null; continue; }
+      if (!cur) continue;
+      const i = line.indexOf(":");
+      if (i < 1) continue;
+      const name = line.slice(0, i).split(";")[0];
+      if (["DTSTART", "SUMMARY", "LOCATION", "DESCRIPTION", "URL"].includes(name)) {
+        cur[name] = unescapeICS(line.slice(i + 1));
+      }
+    }
+    return events;
+  }
+
+  function parseDTSTART(v) {
+    const m = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2}))?/.exec(v || "");
+    if (!m) return null;
+    return {
+      date: new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])),
+      time: m[4] ? `${m[4]}:${m[5]}` : null,
+    };
+  }
+
+  function renderGames(events) {
+    gamesList.textContent = "";
+    if (!events.length) {
+      const li = document.createElement("li");
+      li.className = "msg";
+      li.textContent = "No upcoming games.";
+      gamesList.append(li);
+      return;
+    }
+    const fmt = new Intl.DateTimeFormat("pt-PT", {
+      weekday: "short", day: "numeric", month: "short", timeZone: "UTC",
+    });
+    for (const ev of events) {
+      const dt = parseDTSTART(ev.DTSTART);
+      if (!dt) continue;
+      const a = document.createElement("a");
+      a.className = "game";
+      a.href = ev.URL || "#";
+      a.target = "_blank";
+      a.rel = "noopener";
+
+      const when = document.createElement("span");
+      when.className = "when";
+      const d = document.createElement("span");
+      d.className = "d";
+      d.textContent = fmt.format(dt.date);
+      const t = document.createElement("span");
+      t.className = "t";
+      t.textContent = dt.time || "time TBD";
+      when.append(d, t);
+
+      const body = document.createElement("span");
+      const who = document.createElement("span");
+      who.className = "who";
+      who.textContent = ev.SUMMARY || "";
+      const meta = document.createElement("span");
+      meta.className = "meta";
+      const comp = (ev.DESCRIPTION || "").split("\n")[0];
+      meta.textContent = [ev.LOCATION, comp].filter(Boolean).join(" · ");
+      meta.style.display = "block";
+      body.append(who, meta);
+
+      a.append(when, body);
+      gamesList.append(a);
+    }
+  }
+
+  fetch("farense.ics")
+    .then((r) => {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    })
+    .then((text) => renderGames(parseEvents(text)))
+    .catch(() => {
+      gamesList.textContent = "";
+      const li = document.createElement("li");
+      li.className = "msg";
+      li.textContent = "Could not load games — subscribe to the .ics above instead.";
+      gamesList.append(li);
+    });
+</script>
   <footer>Made with ❤️ by fmagno</footer>
 </body>
 </html>
