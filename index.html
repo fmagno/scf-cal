@@ -171,8 +171,11 @@
 
 <script>
   const URL_TO_COPY = document.getElementById("ics-url").textContent.trim();
+  // Google's one-click subscribe (render?cid=) is broken with https:// URLs;
+  // webcal:// is the workaround that reliably shows the confirmation dialog.
+  const WEBCAL = URL_TO_COPY.replace(/^https:/, "webcal:");
   document.getElementById("google").href =
-    "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(URL_TO_COPY);
+    "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(WEBCAL);
 
   const toast = document.getElementById("toast");
   let toastTimer;

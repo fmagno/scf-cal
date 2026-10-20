@@ -1,32 +1,34 @@
 # scf-ics
 
-Calendário `.ics` dos jogos do **Sénior Masculino do Sporting Clube Farense**,
-gerado automaticamente a partir da página de calendário da FPB.
+iCalendar (`.ics`) feed of the **SC Farense Senior Men's** basketball games,
+automatically generated from the FPB calendar page.
 
-**Subscrever:** `https://fmagno.github.io/scf-ics/farense.ics`
+**Subscribe:** `https://fmagno.github.io/scf-ics/farense.ics`
 
-## Como funciona
+## How it works
 
-- `scraper.py` faz *scrape* de `fpb.pt/calendario/clube_9/...` **e valida cada jogo
-  individualmente** — a competição tem de começar por `Sénior Masculino` e uma das
-  equipas tem de ser o Farense. Os filtros do URL da FPB não são fiáveis e são
-  ignorados de propósito.
-- O `.ics` é **incremental**: jogos novos entram (por `UID`), jogos já existentes
-  só mudam quando os dados mudam (ex.: horário de "a definir" passa a definido),
-  e jogos com **mais de 6 meses** são removidos — o ficheiro não cresce para sempre.
-- Se a página da FPB mudar e nenhum jogo válido for encontrado, o script **falha
-  sem tocar** no `.ics` existente (os subscritos nunca ficam sem calendário).
-- Um GitHub Action corre **de hora a hora** e só faz *commit* se o `.ics` mudar.
+- `scraper.py` scrapes `fpb.pt/calendario/clube_9/...` **and validates every game
+  individually** — the competition must start with `Sénior Masculino` and one of
+  the teams must be Farense. The FPB URL filters are unreliable and are
+  deliberately ignored.
+- The `.ics` is **incremental**: new games are added (by `UID`), existing games
+  only change when the data changes (e.g. a "to be defined" tip-off time gets
+  set), and games **older than 6 months** are removed — the file never grows
+  forever.
+- If the FPB page changes and no valid games are found, the script **fails
+  without touching** the existing `.ics` (subscribers never lose their calendar).
+- A GitHub Action runs **hourly** and only commits when the `.ics` changes.
 
 ## Local
 
 ```sh
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 .venv/bin/python scraper.py
 ```
 
-## Setup repositório (uma vez)
+## Repository setup (one-time)
 
-1. Push para `github.com/fmagno/scf-ics`
-2. Settings → Pages → Source: `main`, pasta `/` (raiz)
+1. Push to `github.com/fmagno/scf-ics`
+2. Settings → Pages → Source: `main`, folder `/` (root)
 3. Settings → Actions → General → Workflow permissions → **Read and write**
