@@ -29,7 +29,7 @@ DTSTART_RE = re.compile(r"^DTSTART[^:]*:(\d{8})(?:T(\d{6}))?", re.MULTILINE)
 UID_RE = re.compile(r"^UID:(.+)$", re.MULTILINE)
 DTSTAMP_RE = re.compile(r"^DTSTAMP[^:]*:.*$", re.MULTILINE)
 
-USER_AGENT = "scf-ics/1.0 (+https://github.com/fmagno/scf-ics)"
+USER_AGENT = "scf-cal/1.0 (+https://github.com/fmagno/scf-cal)"
 
 
 def parse_date(text):
@@ -225,7 +225,7 @@ def build_ics(events, existing):
     header = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//scf-ics//FPB Farense Senior//PT",
+        "PRODID:-//scf-cal//FPB Farense Senior//PT",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
         "X-WR-CALNAME:SC Farense Sénior Masculino",

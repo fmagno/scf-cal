@@ -1,6 +1,6 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//scf-ics//FPB Farense Senior//PT
+PRODID:-//scf-cal//FPB Farense Senior//PT
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:SC Farense Sénior Masculino

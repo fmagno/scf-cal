@@ -1,9 +1,9 @@
-# scf-ics
+# scf-cal
 
 iCalendar (`.ics`) feed of the **SC Farense Senior Men's** basketball games,
 automatically generated from the FPB calendar page.
 
-**Subscribe:** `https://fmagno.github.io/scf-ics/farense.ics`
+**Subscribe:** `https://fmagno.github.io/scf-cal/farense.ics`
 
 ## How it works
 
@@ -29,6 +29,6 @@ python3 -m venv .venv
 
 ## Repository setup (one-time)
 
-1. Push to `github.com/fmagno/scf-ics`
+1. Push to `github.com/fmagno/scf-cal`
 2. Settings → Pages → Source: `main`, folder `/` (root)
 3. Settings → Actions → General → Workflow permissions → **Read and write**

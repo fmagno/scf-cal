@@ -27,7 +27,7 @@ jobs:
       - name: Commit if changed
         run: |
           if ! git diff --quiet -- farense.ics meta.json; then
-            git config user.name "scf-ics-bot"
+            git config user.name "scf-cal-bot"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add farense.ics meta.json
             git commit -m "chore: update calendar"
