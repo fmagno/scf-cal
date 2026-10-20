@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendar - SC Farense - Basketball - Senior Men</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1b1b1f;
+    --muted: #6b6f76;
+    --border: #e2e4e8;
+    --accent: #d2161e;
+    --toast-bg: #1b1b1f;
+    --toast-text: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111317;
+      --card: #1b1e24;
+      --text: #eceef1;
+      --muted: #9aa0a8;
+      --border: #2b2f37;
+      --accent: #e5323a;
+      --toast-bg: #eceef1;
+      --toast-text: #111317;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Zen Dots", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: .01em;
+    text-align: center;
+  }
+  .box {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    width: min(34rem, 100%);
+    padding: .8rem .9rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: .75rem;
+    box-shadow: 0 6px 24px rgba(0,0,0,.08);
+  }
+  .box .ball {
+    flex: none;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .box code {
+    flex: 1;
+    min-width: 0;
+    font-size: .8rem;
+    overflow-wrap: anywhere;
+    user-select: all;
+  }
+  .box button {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: .5rem;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .box button:hover {
+    color: var(--text);
+    border-color: var(--muted);
+  }
+  .box button:active { transform: translateY(1px); }
+  .box button svg { width: 1.1rem; height: 1.1rem; }
+  #toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translate(-50%, .5rem);
+    padding: .6rem 1rem;
+    border-radius: .5rem;
+    background: var(--toast-bg);
+    color: var(--toast-text);
+    font-size: .9rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  footer {
+    padding-top: 1.5rem;
+    text-align: center;
+    font-size: .85rem;
+    color: var(--muted);
+  }
+  a.gcal {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .55rem .95rem;
+    border: 1px solid var(--border);
+    border-radius: .5rem;
+    background: var(--card);
+    color: var(--text);
+    font-size: .9rem;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  a.gcal:hover {
+    border-color: var(--muted);
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+  }
+  a.gcal span { font-size: 1rem; line-height: 1; }
+</style>
+</head>
+<body>
+  <main>
+  <h1>Calendar - SC Farense - Basketball - Senior Men</h1>
+
+  <div class="box">
+    <span class="ball" aria-hidden="true">🏀</span>
+
+    <code id="ics-url">https://fmagno.github.io/scf-ics/farense.ics</code>
+
+    <button id="copy" type="button" title="Copy link" aria-label="Copy link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="12" height="12" rx="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </svg>
+    </button>
+  </div>
+
+  <a class="gcal" id="google" href="#" target="_blank" rel="noopener">
+    <span aria-hidden="true">🗓️</span>
+    Add to Google Calendar
+  </a>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite">Link copied!</div>
+
+<script>
+  const URL_TO_COPY = document.getElementById("ics-url").textContent.trim();
+  document.getElementById("google").href =
+    "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(URL_TO_COPY);
+
+  const toast = document.getElementById("toast");
+  let toastTimer;
+
+  document.getElementById("copy").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(URL_TO_COPY);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = URL_TO_COPY;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2000);
+  });
+  </script>
+  <footer>Made with ❤️ by fmagno</footer>
+</body>
+</html>
