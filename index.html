@@ -96,8 +96,24 @@
     margin: 1rem auto 0;
   }
   .footer-above .title-ball {
+    --ball-rest: -16px;
+    display: inline-flex;
+    align-items: center;
+    padding: .3rem;
+    margin: -.3rem;
+    border: 0;
+    background: none;
+    font: inherit;
     font-size: 1.25rem;
     line-height: 1;
+    color: inherit;
+    cursor: pointer;
+    transform: translateY(var(--ball-rest));
+  }
+  .footer-above .title-ball:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: .35rem;
   }
   footer .credit { margin: 0; font-size: .85rem; }
   .subs {
@@ -204,7 +220,9 @@
   </main>
 
   <div class="footer-above">
-    <span class="title-ball" aria-hidden="true">🏀</span>
+    <button class="title-ball" type="button" aria-label="Bounce the basketball">
+      <span aria-hidden="true">🏀</span>
+    </button>
   </div>
 
   <footer>
@@ -380,6 +398,65 @@
       li.textContent = "Could not load games — use the buttons below instead.";
       gamesList.append(li);
     });
+
+  // ---- bouncing basketball ----
+  // The ball starts a little above the footer. Clicking drops it onto the
+  // line, where it bounces and stays; clicking again just taps it into a
+  // small bounce. Only a refresh brings it back up to the starting height.
+  // The drop uses the easeOutBounce curve from the Motion "bounce easing"
+  // example (motion.dev/examples/js-bounce-easing).
+  const ball = document.querySelector(".title-ball");
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // From https://easings.net/#easeOutBounce
+  function bounceEase(x) {
+    const n1 = 7.5625;
+    const d1 = 2.75;
+    if (x < 1 / d1) return n1 * x * x;
+    if (x < 2 / d1) { x -= 1.5 / d1; return n1 * x * x + 0.75; }
+    if (x < 2.5 / d1) { x -= 2.25 / d1; return n1 * x * x + 0.9375; }
+    x -= 2.625 / d1;
+    return n1 * x * x + 0.984375;
+  }
+
+  const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
+
+  function tweenY(el, from, to, duration, ease) {
+    return new Promise((resolve) => {
+      const start = performance.now();
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        el.style.transform = `translateY(${from + (to - from) * ease(t)}px)`;
+        if (t < 1) requestAnimationFrame(step);
+        else resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  const BALL_REST = parseFloat(
+    getComputedStyle(ball).getPropertyValue("--ball-rest")
+  ) || 0;
+  let ballDown = false;
+  let bouncing = false;
+
+  async function bounceBall() {
+    if (bouncing || calm.matches) return;
+    bouncing = true;
+    if (!ballDown) {
+      // full drop from the starting height, then it stays on the line
+      await tweenY(ball, BALL_REST, 0, 1200, bounceEase);
+      ballDown = true;
+    } else {
+      // already down: tap it into a small bounce
+      await tweenY(ball, 0, BALL_REST, 260, easeOutCubic);
+      await tweenY(ball, BALL_REST, 0, 520, bounceEase);
+    }
+    ball.style.transform = "translateY(0px)";
+    bouncing = false;
+  }
+
+  ball.addEventListener("click", bounceBall);
 </script>
 </body>
 </html>
