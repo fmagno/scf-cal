@@ -16,7 +16,7 @@
     --text: #1b1b1f;
     --muted: #6b6f76;
     --border: #e2e4e8;
-    --home-border: #1b1b1f;
+    --home-accent: #ff9262;
     --accent: #d2161e;
     --toast-bg: #1b1b1f;
     --toast-text: #ffffff;
@@ -28,7 +28,6 @@
       --text: #eceef1;
       --muted: #9aa0a8;
       --border: #2b2f37;
-      --home-border: #d8dbe0;
       --accent: #e5323a;
       --toast-bg: #eceef1;
       --toast-text: #111317;
@@ -164,12 +163,14 @@
     transition: border-color .15s, box-shadow .15s;
   }
   #games a.game.home {
-    border: 2px solid var(--home-border);
+    border: 2px solid var(--home-accent);
   }
+  #games a.game.home .meta { color: var(--home-accent); }
   #games a.game:hover {
     border-color: var(--muted);
     box-shadow: 0 4px 14px rgba(0,0,0,.08);
   }
+  #games a.game.home:hover { border-color: var(--home-accent); }
   #games .msg {
     justify-content: center;
     font-size: .8rem;
@@ -206,16 +207,16 @@
     <div class="subs">
       <button class="gcal" id="copy" type="button" title="Copy .ics url" aria-label="Copy .ics url"
               data-ics="https://fmagno.github.io/scf-cal/farense.ics">
-        <img class="brand" src="media/ics_logo.svg" alt="" aria-hidden="true" width="20" height="20">
+        <img class="brand" src="media/ics_logo_gray.svg" alt="" aria-hidden="true" width="20" height="20">
       </button>
 
       <a class="gcal" id="google" href="#" target="_blank" rel="noopener"
          title="Add to Google Calendar" aria-label="Add to Google Calendar">
-      <img class="brand" src="media/google_calendar.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
+      <img class="brand" src="media/google_calendar_gray.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
       </a>
 
       <a class="gcal" id="apple" href="#" title="Add to Apple Calendar" aria-label="Add to Apple Calendar">
-      <img class="brand" src="media/apple_calendar.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
+      <img class="brand" src="media/apple_calendar_gray.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
       </a>
     </div>
 
