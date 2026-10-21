@@ -233,16 +233,16 @@
     <div class="subs">
       <button class="gcal" id="copy" type="button" title="Copy .ics url" aria-label="Copy .ics url"
               data-ics="https://fmagno.github.io/scf-cal/farense.ics">
-        <img class="brand" src="media/ics_logo_gray.svg" alt="" aria-hidden="true" width="20" height="20">
+        <img class="brand" src="media/ics_logo_gray.svg" data-color="media/ics_logo.svg" alt="" aria-hidden="true" width="20" height="20">
       </button>
 
       <a class="gcal" id="google" href="#" target="_blank" rel="noopener"
          title="Add to Google Calendar" aria-label="Add to Google Calendar">
-      <img class="brand" src="media/google_calendar_gray.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
+      <img class="brand" src="media/google_calendar_gray.svg" data-color="media/google_calendar.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
       </a>
 
       <a class="gcal" id="apple" href="#" title="Add to Apple Calendar" aria-label="Add to Apple Calendar">
-      <img class="brand" src="media/apple_calendar_gray.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
+      <img class="brand" src="media/apple_calendar_gray.svg" data-color="media/apple_calendar.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
       </a>
     </div>
 
@@ -260,6 +260,38 @@
   // Safari (macOS/iOS) opens Calendar.app directly from a webcal:// link and
   // shows the "subscribe" confirmation. Other browsers may just ignore it.
   document.getElementById("apple").href = WEBCAL;
+
+  // ---- brand icons ----
+  // The buttons show grey icons until they are hovered, focused or pressed,
+  // when they swap to the coloured version for a moment.
+  document.querySelectorAll(".gcal img.brand").forEach((img) => {
+    const grey = img.getAttribute("src");
+    const colour = img.dataset.color;
+    const button = img.closest(".gcal");
+    let hovering = false;
+    let focused = false;
+    let flashing = false;
+    let flashTimer;
+
+    const paint = () => {
+      img.src = hovering || focused || flashing ? colour : grey;
+    };
+    const flash = () => {
+      flashing = true;
+      paint();
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => {
+        flashing = false;
+        paint();
+      }, 900);
+    };
+
+    button.addEventListener("pointerenter", () => { hovering = true; paint(); });
+    button.addEventListener("pointerleave", () => { hovering = false; paint(); });
+    button.addEventListener("focus", () => { focused = true; paint(); });
+    button.addEventListener("blur", () => { focused = false; paint(); });
+    button.addEventListener("click", flash);
+  });
 
   const toast = document.getElementById("toast");
   let toastTimer;
