@@ -54,13 +54,19 @@
     justify-content: center;
     gap: 1.25rem;
   }
-  h1 {
+  .titles {
+    text-align: center;
+  }
+  .titles h1 {
     margin: 0;
     font-size: 1.35rem;
     font-weight: 400;
     letter-spacing: .01em;
-    text-align: center;
     color: #8f8f8f;
+  }
+  .titles h1 + h1 {
+    margin-top: .4rem;
+    font-size: 1rem;
   }
   #toast {
     position: fixed;
@@ -225,7 +231,10 @@
 </head>
 <body>
   <main>
-  <h1>Calendar - SC Farense - Basketball - Senior Men</h1>
+  <div class="titles">
+    <h1>Calendar - SC Farense 🏀</h1>
+    <h1>Senior Men</h1>
+  </div>
 
   <section id="games">
     <h2>Upcoming games</h2>
