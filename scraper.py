@@ -230,6 +230,8 @@ def build_ics(events, existing):
         "METHOD:PUBLISH",
         "X-WR-CALNAME:SC Farense Sénior Masculino",
         "X-WR-TIMEZONE:Europe/Lisbon",
+        "REFRESH-INTERVAL;VALUE=DURATION:PT1H",
+        "X-PUBLISHED-TTL:PT1H",
         "BEGIN:VTIMEZONE",
         "TZID:Europe/Lisbon",
         "BEGIN:DAYLIGHT",
