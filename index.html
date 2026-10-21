@@ -292,9 +292,23 @@
 
   const HOME_VENUE = "Pavilhão do Sporting Clube Farense";
 
+  // Past games stay in the .ics (6-month retention), but the landing page
+  // only shows what's still ahead. Timed games are past once their start
+  // instant has passed; all-day games stay visible through their whole day.
+  function isPast(dt) {
+    if (dt.time) return dt.date.getTime() <= Date.now();
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    return dt.date.getTime() < startOfToday.getTime();
+  }
+
   function renderGames(events) {
+    const upcoming = events.filter((ev) => {
+      const dt = parseDTSTART(ev.DTSTART);
+      return dt && !isPast(dt);
+    });
     gamesList.textContent = "";
-    if (!events.length) {
+    if (!upcoming.length) {
       const li = document.createElement("li");
       li.className = "msg";
       li.textContent = "No upcoming games.";
@@ -304,9 +318,8 @@
     const fmt = new Intl.DateTimeFormat("pt-PT", {
       weekday: "short", day: "numeric", month: "short", timeZone: "UTC",
     });
-    for (const ev of events) {
+    for (const ev of upcoming) {
       const dt = parseDTSTART(ev.DTSTART);
-      if (!dt) continue;
       const a = document.createElement("a");
       a.className = "game";
       a.href = ev.URL || "#";
