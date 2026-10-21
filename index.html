@@ -160,17 +160,18 @@
     border-radius: .65rem;
     color: inherit;
     text-decoration: none;
-    transition: border-color .15s, box-shadow .15s;
+    transition: border-color .15s, box-shadow .15s, background-color .15s, transform .15s;
   }
-  #games a.game.home {
-    border: 2px solid var(--home-accent);
-  }
-  #games a.game.home .meta { color: var(--home-accent); }
   #games a.game:hover {
-    border-color: var(--muted);
+    border-color: color-mix(in srgb, var(--text) 22%, var(--border));
+    background-color: color-mix(in srgb, var(--text) 4%, var(--card));
     box-shadow: 0 4px 14px rgba(0,0,0,.08);
+    transform: translateY(-1px);
   }
-  #games a.game.home:hover { border-color: var(--home-accent); }
+  #games a.game:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
   #games .msg {
     justify-content: center;
     font-size: .8rem;
@@ -185,6 +186,11 @@
   #games .when .t { display: block; font-size: .65rem; color: var(--muted); }
   #games .who { font-size: .8rem; line-height: 1.35; }
   #games .meta { font-size: .65rem; color: var(--muted); line-height: 1.35; }
+  #games a.game.home .meta { color: var(--home-accent); }
+  @media (prefers-reduced-motion: reduce) {
+    #games a.game, #games .msg, .gcal { transition: none; }
+    #games a.game:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -290,6 +296,7 @@
   }
 
   const HOME_VENUE = "Pavilhão do Sporting Clube Farense";
+  const MAPS_DIRECTIONS = "https://www.google.com/maps/dir/?api=1&destination=";
 
   // Past games stay in the .ics (6-month retention), but the landing page
   // only shows what's still ahead. Timed games are past once their start
@@ -321,10 +328,16 @@
       const dt = parseDTSTART(ev.DTSTART);
       const a = document.createElement("a");
       a.className = "game";
-      a.href = ev.URL || "#";
+      const location = ev.LOCATION || "";
+      // Tapping a game opens directions to its venue on Google Maps; the
+      // FPB match sheet is only used when the event has no location.
+      a.href = location
+        ? MAPS_DIRECTIONS + encodeURIComponent(location)
+        : ev.URL || "#";
       a.target = "_blank";
       a.rel = "noopener";
-      if ((ev.LOCATION || "").includes(HOME_VENUE)) a.classList.add("home");
+      if (location) a.title = "Directions to " + location;
+      if (location.includes(HOME_VENUE)) a.classList.add("home");
 
       const when = document.createElement("span");
       when.className = "when";
@@ -340,12 +353,14 @@
       const who = document.createElement("span");
       who.className = "who";
       who.textContent = ev.SUMMARY || "";
-      const meta = document.createElement("span");
-      meta.className = "meta";
-      const comp = (ev.DESCRIPTION || "").split("\n")[0];
-      meta.textContent = [ev.LOCATION, comp].filter(Boolean).join(" · ");
-      meta.style.display = "block";
-      body.append(who, meta);
+      body.append(who);
+      if (ev.LOCATION) {
+        const meta = document.createElement("span");
+        meta.className = "meta";
+        meta.textContent = ev.LOCATION;
+        meta.style.display = "block";
+        body.append(meta);
+      }
 
       a.append(when, body);
       gamesList.append(a);
