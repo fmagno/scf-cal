@@ -54,55 +54,17 @@
     gap: 1.25rem;
   }
   h1 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
     margin: 0;
     font-size: 1.35rem;
     font-weight: 400;
     letter-spacing: .01em;
     text-align: center;
   }
-  .box {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    width: min(34rem, 100%);
-    padding: .8rem .9rem;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: .75rem;
-    box-shadow: 0 6px 24px rgba(0,0,0,.08);
-  }
-  .box .ball {
-    flex: none;
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-  .box code {
-    flex: 1;
-    min-width: 0;
-    font-size: .8rem;
-    overflow-wrap: anywhere;
-    user-select: all;
-  }
-  .box button {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
-    border: 1px solid var(--border);
-    border-radius: .5rem;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: color .15s, border-color .15s, background .15s;
-  }
-  .box button:hover {
-    color: var(--text);
-    border-color: var(--muted);
-  }
-  .box button:active { transform: translateY(1px); }
-  .box button svg { width: 1.1rem; height: 1.1rem; }
+  h1 .title-ball { font-size: 1.25rem; line-height: 1; }
   #toast {
     position: fixed;
     bottom: 1.5rem;
@@ -122,29 +84,50 @@
     transform: translate(-50%, 0);
   }
   footer {
-    padding-top: 1.5rem;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: min(34rem, 100%);
+    margin: 1.75rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
     font-size: .85rem;
     color: var(--muted);
   }
-  a.gcal {
+  footer .credit { margin: 0; font-size: .85rem; }
+  .subs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .45rem;
+  }
+  .gcal {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: .45rem;
-    padding: .55rem .95rem;
+    padding: .5rem;
     border: 1px solid var(--border);
     border-radius: .5rem;
     background: var(--card);
     color: var(--text);
+    font: inherit;
     font-size: .9rem;
+    cursor: pointer;
     text-decoration: none;
     transition: border-color .15s, box-shadow .15s;
   }
-  a.gcal:hover {
+  a.gcal:hover, button.gcal:hover {
     border-color: var(--muted);
     box-shadow: 0 4px 14px rgba(0,0,0,.08);
   }
-  a.gcal span { font-size: 1rem; line-height: 1; }
+  .gcal .brand {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: .2rem;
+  }
   #games {
     width: min(34rem, 100%);
     margin-top: .75rem;
@@ -200,25 +183,7 @@
 </head>
 <body>
   <main>
-  <h1>Calendar - SC Farense - Basketball - Senior Men</h1>
-
-  <div class="box">
-    <span class="ball" aria-hidden="true">🏀</span>
-
-    <code id="ics-url">https://fmagno.github.io/scf-cal/farense.ics</code>
-
-    <button id="copy" type="button" title="Copy link" aria-label="Copy link">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="9" y="9" width="12" height="12" rx="2"/>
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-      </svg>
-    </button>
-  </div>
-
-  <a class="gcal" id="google" href="#" target="_blank" rel="noopener">
-    <span aria-hidden="true">🗓️</span>
-    Add to Google Calendar
-  </a>
+  <h1><span class="title-ball" aria-hidden="true">🏀</span> Calendar - SC Farense - Basketball - Senior Men</h1>
 
   <section id="games">
     <h2>Upcoming games</h2>
@@ -226,15 +191,39 @@
   </section>
   </main>
 
+  <footer>
+    <p class="credit">Made with ❤️ by fmagno</p>
+
+    <div class="subs">
+      <button class="gcal" id="copy" type="button" title="Copy .ics url" aria-label="Copy .ics url"
+              data-ics="https://fmagno.github.io/scf-cal/farense.ics">
+        <img class="brand" src="media/ics_logo.svg" alt="" aria-hidden="true" width="20" height="20">
+      </button>
+
+      <a class="gcal" id="google" href="#" target="_blank" rel="noopener"
+         title="Add to Google Calendar" aria-label="Add to Google Calendar">
+      <img class="brand" src="media/google_calendar.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
+      </a>
+
+      <a class="gcal" id="apple" href="#" title="Add to Apple Calendar" aria-label="Add to Apple Calendar">
+      <img class="brand" src="media/apple_calendar.svg" alt="" aria-hidden="true" width="20" height="20" loading="lazy">
+      </a>
+    </div>
+
+  </footer>
+
   <div id="toast" role="status" aria-live="polite">Link copied!</div>
 
 <script>
-  const URL_TO_COPY = document.getElementById("ics-url").textContent.trim();
+  const URL_TO_COPY = document.getElementById("copy").dataset.ics;
   // Google's one-click subscribe (render?cid=) is broken with https:// URLs;
   // webcal:// is the workaround that reliably shows the confirmation dialog.
   const WEBCAL = URL_TO_COPY.replace(/^https:/, "webcal:");
   document.getElementById("google").href =
     "https://calendar.google.com/calendar/render?cid=" + encodeURIComponent(WEBCAL);
+  // Safari (macOS/iOS) opens Calendar.app directly from a webcal:// link and
+  // shows the "subscribe" confirmation. Other browsers may just ignore it.
+  document.getElementById("apple").href = WEBCAL;
 
   const toast = document.getElementById("toast");
   let toastTimer;
@@ -363,10 +352,9 @@
       gamesList.textContent = "";
       const li = document.createElement("li");
       li.className = "msg";
-      li.textContent = "Could not load games — subscribe to the .ics above instead.";
+      li.textContent = "Could not load games — use the buttons below instead.";
       gamesList.append(li);
     });
 </script>
-  <footer>Made with ❤️ by fmagno</footer>
 </body>
 </html>
