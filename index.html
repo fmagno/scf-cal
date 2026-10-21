@@ -16,6 +16,7 @@
     --text: #1b1b1f;
     --muted: #6b6f76;
     --border: #e2e4e8;
+    --home-border: #1b1b1f;
     --accent: #d2161e;
     --toast-bg: #1b1b1f;
     --toast-text: #ffffff;
@@ -27,6 +28,7 @@
       --text: #eceef1;
       --muted: #9aa0a8;
       --border: #2b2f37;
+      --home-border: #d8dbe0;
       --accent: #e5323a;
       --toast-bg: #eceef1;
       --toast-text: #111317;
@@ -173,6 +175,9 @@
     text-decoration: none;
     transition: border-color .15s, box-shadow .15s;
   }
+  #games a.game.home {
+    border: 2px solid var(--home-border);
+  }
   #games a.game:hover {
     border-color: var(--muted);
     box-shadow: 0 4px 14px rgba(0,0,0,.08);
@@ -285,6 +290,8 @@
     };
   }
 
+  const HOME_VENUE = "Pavilhão do Sporting Clube Farense";
+
   function renderGames(events) {
     gamesList.textContent = "";
     if (!events.length) {
@@ -305,6 +312,7 @@
       a.href = ev.URL || "#";
       a.target = "_blank";
       a.rel = "noopener";
+      if ((ev.LOCATION || "").includes(HOME_VENUE)) a.classList.add("home");
 
       const when = document.createElement("span");
       when.className = "when";
