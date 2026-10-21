@@ -100,6 +100,7 @@
   }
   .footer-above .title-ball {
     --ball-rest: -16px;
+    position: relative;
     display: inline-flex;
     align-items: center;
     padding: .3rem;
@@ -111,7 +112,16 @@
     line-height: 1;
     color: inherit;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transform: translateY(var(--ball-rest));
+  }
+  /* Invisible padding around the ball so it is easy to hit on a phone
+     without moving it on the page. */
+  .footer-above .title-ball::after {
+    content: "";
+    position: absolute;
+    inset: -.75rem;
   }
   .footer-above .title-ball:focus-visible {
     outline: 2px solid var(--accent);
@@ -477,8 +487,15 @@
   let bouncing = false;
 
   async function bounceBall() {
-    if (bouncing || calm.matches) return;
+    if (bouncing) return;
     bouncing = true;
+    if (calm.matches) {
+      // no motion: drop it straight onto the line
+      ballDown = true;
+      ball.style.transform = "translateY(0px)";
+      bouncing = false;
+      return;
+    }
     if (!ballDown) {
       // full drop from the starting height, then it stays on the line
       await tweenY(ball, BALL_REST, 0, 1200, bounceEase);
@@ -492,7 +509,12 @@
     bouncing = false;
   }
 
-  ball.addEventListener("click", bounceBall);
+  // pointerdown reacts on the first touch, the click handler is only for
+  // keyboard activation (detail 0).
+  ball.addEventListener("pointerdown", bounceBall);
+  ball.addEventListener("click", (e) => {
+    if (e.detail === 0) bounceBall();
+  });
 </script>
 </body>
 </html>
