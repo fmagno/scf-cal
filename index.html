@@ -361,6 +361,8 @@
 
   const HOME_VENUE = "Pavilhão do Sporting Clube Farense";
   const MAPS_DIRECTIONS = "https://www.google.com/maps/dir/?api=1&destination=";
+  // Exact pin of the home pavilion, the text search often lands elsewhere.
+  const HOME_MAPS = "https://maps.app.goo.gl/XtaniZmDvKCKvg1r8";
 
   // Past games stay in the .ics (6-month retention), but the landing page
   // only shows what's still ahead. Timed games are past once their start
@@ -393,15 +395,18 @@
       const a = document.createElement("a");
       a.className = "game";
       const location = ev.LOCATION || "";
-      // Tapping a game opens directions to its venue on Google Maps; the
-      // FPB match sheet is only used when the event has no location.
-      a.href = location
-        ? MAPS_DIRECTIONS + encodeURIComponent(location)
-        : ev.URL || "#";
+      const isHome = location.includes(HOME_VENUE);
+      // Home games point at the exact pavilion pin, the others open
+      // directions to the venue written in the calendar.
+      let href;
+      if (isHome) href = HOME_MAPS;
+      else if (location) href = MAPS_DIRECTIONS + encodeURIComponent(location);
+      else href = ev.URL || "#";
+      a.href = href;
       a.target = "_blank";
       a.rel = "noopener";
       if (location) a.title = "Directions to " + location;
-      if (location.includes(HOME_VENUE)) a.classList.add("home");
+      if (isHome) a.classList.add("home");
 
       const when = document.createElement("span");
       when.className = "when";
