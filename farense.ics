@@ -63,4 +63,17 @@ URL:https://www.fpb.pt/ficha-de-jogo?internalID=416313
 STATUS:CONFIRMED
 TRANSP:OPAQUE
 END:VEVENT
+BEGIN:VEVENT
+UID:416324@fpb.pt
+DTSTAMP:20261022T013407Z
+DTSTART;TZID=Europe/Lisbon:20261121T170000
+DTEND;TZID=Europe/Lisbon:20261121T190000
+SUMMARY:SC Farense vs Salesianos Évora Biz Center
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416324
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416324
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
 END:VCALENDAR
