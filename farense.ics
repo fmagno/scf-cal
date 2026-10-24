@@ -76,4 +76,188 @@ URL:https://www.fpb.pt/ficha-de-jogo?internalID=416324
 STATUS:CONFIRMED
 TRANSP:OPAQUE
 END:VEVENT
+BEGIN:VEVENT
+UID:416328@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20261127T204500
+DTEND;TZID=Europe/Lisbon:20261127T224500
+SUMMARY:Gaviões de São Brás Clube vs SC Farense
+LOCATION:Pavilhão Municipal Dr. José de Sousa Pires\, São Brás de Alpor
+ tel
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416328
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416328
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416333@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20261205T170000
+DTEND;TZID=Europe/Lisbon:20261205T190000
+SUMMARY:SC Farense vs GDR André de Resende
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416333
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416333
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416339@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20261209T213000
+DTEND;TZID=Europe/Lisbon:20261209T233000
+SUMMARY:Ginásio CO B vs SC Farense
+LOCATION:Pavilhão do Ginásio Clube Olhanense\, Olhão
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416339
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416339
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416347@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270109T170000
+DTEND;TZID=Europe/Lisbon:20270109T190000
+SUMMARY:SC Farense vs ASC/BVRM - Monsaraz
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416347
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416347
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416350@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270123T170000
+DTEND;TZID=Europe/Lisbon:20270123T190000
+SUMMARY:SC Farense vs Imortal PNEU RÁPIDO
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416350
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416350
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416354@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270131T170000
+DTEND;TZID=Europe/Lisbon:20270131T190000
+SUMMARY:CF Os Bonjoanenses Faro vs SC Farense
+LOCATION:Pavilhão Municipal da Penha\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416354
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416354
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416358@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270206T170000
+DTEND;TZID=Europe/Lisbon:20270206T190000
+SUMMARY:SC Farense vs CBQ Tubarões
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416358
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416358
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416363@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270220T150000
+DTEND;TZID=Europe/Lisbon:20270220T170000
+SUMMARY:ACD Ferragudo vs SC Farense
+LOCATION:Nave Desportiva de Ferragudo\, Ferragudo
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416363
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416363
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416368@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270227T170000
+DTEND;TZID=Europe/Lisbon:20270227T190000
+SUMMARY:SC Farense vs Beja Basket Clube
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416368
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416368
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416379@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270314T163000
+DTEND;TZID=Europe/Lisbon:20270314T183000
+SUMMARY:Salesianos Évora Biz Center vs SC Farense
+LOCATION:Pavilhão D. Bosco - Salesianos Évora\, Évora
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416379
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416379
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416383@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270320T170000
+DTEND;TZID=Europe/Lisbon:20270320T190000
+SUMMARY:SC Farense vs Gaviões de São Brás Clube
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416383
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416383
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416388@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270411T180000
+DTEND;TZID=Europe/Lisbon:20270411T200000
+SUMMARY:GDR André de Resende vs SC Farense
+LOCATION:Pavilhão EB23 André Resende\, Évora
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416388
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416388
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416394@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270416T210000
+DTEND;TZID=Europe/Lisbon:20270416T230000
+SUMMARY:SC Farense vs Ginásio CO B
+LOCATION:Pavilhão do Sporting Clube Farense\, Faro
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416394
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416394
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+UID:416402@fpb.pt
+DTSTAMP:20261024T002118Z
+DTSTART;TZID=Europe/Lisbon:20270425T170000
+DTEND;TZID=Europe/Lisbon:20270425T190000
+SUMMARY:ASC/BVRM - Monsaraz vs SC Farense
+LOCATION:Pavilhão Municipal Reguengos - Arq. Rosado Correia\, Reguengos de
+  Monsaraz
+DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
+ alID=416402
+URL:https://www.fpb.pt/ficha-de-jogo?internalID=416402
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
 END:VCALENDAR
