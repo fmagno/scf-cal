@@ -195,10 +195,11 @@
     gap: .55rem;
   }
   #games a.game, #games .msg {
-    display: flex;
-    gap: .9rem;
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: .8rem;
     align-items: center;
-    padding: .7rem .9rem;
+    padding: .7rem .8rem;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: .65rem;
@@ -222,11 +223,10 @@
     color: var(--muted);
   }
   #games .when {
-    flex: none;
-    width: 4.75rem;
-    text-align: center;
+    text-align: left;
+    min-width: 0;
   }
-  #games .when .d { display: block; font-size: .8rem; }
+  #games .when .d { display: block; font-size: .75rem; line-height: 1.25; }
   #games .when .t { display: block; font-size: .65rem; color: var(--muted); }
   #games .who { font-size: .8rem; line-height: 1.35; }
   #games .meta { font-size: .65rem; color: var(--muted); line-height: 1.35; }
@@ -405,7 +405,7 @@
       return;
     }
     const fmt = new Intl.DateTimeFormat("pt-PT", {
-      weekday: "short", day: "numeric", month: "short", timeZone: "UTC",
+      weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC",
     });
     for (const ev of upcoming) {
       const dt = parseDTSTART(ev.DTSTART);
