@@ -4,6 +4,7 @@
 import json
 import re
 import sys
+import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -14,6 +15,12 @@ URL = (
     "https://www.fpb.pt/calendario/clube_9/"
     "?clube=9&epoca=2026/2027&genero=masculino&escalao=S%C3%A9nior&"
 )
+AJAX_URL = "https://www.fpb.pt/wp-admin/admin-ajax.php"
+SEASON_END = date(2027, 7, 31)
+# The calendar is not paginated: the initial HTML only covers ~28 days and the
+# rest is appended by AJAX in 30-day windows as you scroll. Crawl those windows.
+WINDOW_DAYS = 30
+MAX_WINDOWS = 12
 ICS_PATH = Path(__file__).resolve().parent / "farense.ics"
 META_PATH = Path(__file__).resolve().parent / "meta.json"
 
@@ -22,7 +29,7 @@ MONTHS = {
     "JUL": 7, "AGO": 8, "SET": 9, "OUT": 10, "NOV": 11, "DEZ": 12,
 }
 RETENTION_DAYS = 183  # ~6 months, based on event date
-SENIOR_MASC_RE = re.compile(r"^\s*S[eé]nior\s+Masculino\b", re.IGNORECASE)
+SENIOR_MASC_RE = re.compile(r"(S[eé]nior\s+Masculino|2[ªº]\s+Divis[ãa]o\s+Masculina)", re.IGNORECASE)
 TIME_RE = re.compile(r"^([01]?\d|2[0-3])H([0-5]\d)$")
 DATE_RE = re.compile(r"^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$")
 DTSTART_RE = re.compile(r"^DTSTART[^:]*:(\d{8})(?:T(\d{6}))?", re.MULTILINE)
@@ -42,13 +49,24 @@ def parse_date(text):
     return date(year, mon, day)
 
 
-def scrape():
-    resp = requests.get(URL, headers={"User-Agent": USER_AGENT}, timeout=30)
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
+def fetch(session, url, params=None):
+    """GET with a couple of retries; fpb.pt is occasionally slow."""
+    last_exc = None
+    for attempt in range(3):
+        try:
+            resp = session.get(url, params=params, timeout=90)
+            resp.raise_for_status()
+            return resp
+        except Exception as exc:
+            last_exc = exc
+            if attempt < 2:
+                time.sleep(3)
+    raise last_exc
 
+
+def parse_events(html, seen_uids, skipped):
     events = []
-    skipped_no_date = 0
+    soup = BeautifulSoup(html, "html.parser")
     for row in soup.select("div.day-wrapper"):
         date_hdr = row.select_one("h3.date")
         event_date = parse_date(date_hdr.get_text(" ", strip=True)) if date_hdr else None
@@ -57,7 +75,7 @@ def scrape():
             competition = comp_el.get_text(" ", strip=True) if comp_el else ""
 
             # Never trust the URL filters: validate each event itself.
-            if not SENIOR_MASC_RE.match(competition):
+            if not SENIOR_MASC_RE.search(competition):
                 continue
             siglas = [s.get_text(" ", strip=True) for s in game.select("span.sigla")]
             if not any("farense" in s.lower() for s in siglas):
@@ -66,7 +84,7 @@ def scrape():
                 continue
 
             if event_date is None:
-                skipped_no_date += 1
+                skipped[0] += 1
                 continue
 
             time_el = game.select_one("div.hour h3")
@@ -87,9 +105,13 @@ def scrape():
             uid_m = re.search(r"internalID=(\d+)", game.get("href", ""))
             if not uid_m:
                 continue
+            uid = f"{uid_m.group(1)}@fpb.pt"
+            if uid in seen_uids:
+                continue
+            seen_uids.add(uid)
 
             events.append({
-                "uid": f"{uid_m.group(1)}@fpb.pt",
+                "uid": uid,
                 "date": event_date,
                 "time": time_hm,
                 "home_away": siglas,
@@ -98,9 +120,62 @@ def scrape():
                 "competition": competition.split("|", 1)[-1].strip(),
                 "url": f"https://www.fpb.pt/ficha-de-jogo?internalID={uid_m.group(1)}",
             })
+    return events
 
-    if skipped_no_date:
-        print(f"warn: skipped {skipped_no_date} game(s) with no date")
+
+def load_more(session, start, end):
+    params = {
+        "action": "get_more_days",
+        "clube": "9",
+        "epoca": "2026/2027",
+        "escalao": "Sénior",
+        "genero": "masculino",
+        "period[time_option]": "loadmore",
+        "period[from_date]": start.isoformat(),
+        "period[to_date]": end.isoformat(),
+    }
+    obj = fetch(session, AJAX_URL, params).json()
+    result = obj.get("result") or ""
+    if isinstance(result, list):
+        result = "".join(result)
+    return result, bool(obj.get("hasmore"))
+
+
+def scrape():
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": USER_AGENT,
+        "X-Requested-With": "XMLHttpRequest",
+    })
+
+    events = []
+    seen_uids = set()
+    skipped = [0]
+
+    # First chunk: the server-rendered page (~next 28 days).
+    resp = fetch(session, URL)
+    events.extend(parse_events(resp.text, seen_uids, skipped))
+
+    # Remaining chunks: same AJAX endpoint the infinite scroll uses.
+    start = date.today() + timedelta(days=WINDOW_DAYS - 1)
+    for _ in range(MAX_WINDOWS):
+        end = start + timedelta(days=WINDOW_DAYS - 1)
+        if start > SEASON_END:
+            break
+        try:
+            html, has_more = load_more(session, start, end)
+        except Exception as exc:
+            print(f"warn: load-more failed for {start}..{end}: {exc}")
+            break
+        if not html.strip():
+            break
+        events.extend(parse_events(html, seen_uids, skipped))
+        if not has_more:
+            break
+        start = end + timedelta(days=1)
+
+    if skipped[0]:
+        print(f"warn: skipped {skipped[0]} game(s) with no date")
     return events
 
 
