@@ -279,6 +279,7 @@
 
   <div id="toast" role="status" aria-live="polite">Link copied!</div>
 
+<script src="games.js"></script>
 <script>
   const URL_TO_COPY = document.getElementById("copy").dataset.ics;
   // Google's one-click subscribe (render?cid=) is broken with https:// URLs;
@@ -344,58 +345,13 @@
   // ---- upcoming games, parsed from the same farense.ics that is subscribed ----
   const gamesList = document.getElementById("games-list");
 
-  function unescapeICS(v) {
-    return v.replace(/\\n/g, "\n").replace(/\\([\\;,])/g, "$1");
-  }
-
-  function parseEvents(text) {
-    const lines = text.replace(/\r\n[ \t]/g, "").replace(/\r[ \t]/g, "").split("\n");
-    const events = [];
-    let cur = null;
-    for (const raw of lines) {
-      const line = raw.replace(/\r$/, "");
-      if (line === "BEGIN:VEVENT") { cur = {}; continue; }
-      if (line === "END:VEVENT") { if (cur) events.push(cur); cur = null; continue; }
-      if (!cur) continue;
-      const i = line.indexOf(":");
-      if (i < 1) continue;
-      const name = line.slice(0, i).split(";")[0];
-      if (["DTSTART", "SUMMARY", "LOCATION", "DESCRIPTION", "URL"].includes(name)) {
-        cur[name] = unescapeICS(line.slice(i + 1));
-      }
-    }
-    return events;
-  }
-
-  function parseDTSTART(v) {
-    const m = /^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2}))?/.exec(v || "");
-    if (!m) return null;
-    return {
-      date: new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])),
-      time: m[4] ? `${m[4]}:${m[5]}` : null,
-    };
-  }
-
   const HOME_VENUE = "Pavilhão do Sporting Clube Farense";
   const MAPS_DIRECTIONS = "https://www.google.com/maps/dir/?api=1&destination=";
   // Exact pin of the home pavilion, the text search often lands elsewhere.
   const HOME_MAPS = "https://maps.app.goo.gl/XtaniZmDvKCKvg1r8";
 
-  // Past games stay in the .ics (6-month retention), but the landing page
-  // only shows what's still ahead. Timed games are past once their start
-  // instant has passed; all-day games stay visible through their whole day.
-  function isPast(dt) {
-    if (dt.time) return dt.date.getTime() <= Date.now();
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-    return dt.date.getTime() < startOfToday.getTime();
-  }
-
   function renderGames(events) {
-    const upcoming = events.filter((ev) => {
-      const dt = parseDTSTART(ev.DTSTART);
-      return dt && !isPast(dt);
-    });
+    const upcoming = upcomingEvents(events);
     gamesList.textContent = "";
     if (!upcoming.length) {
       const li = document.createElement("li");

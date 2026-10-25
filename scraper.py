@@ -7,16 +7,18 @@ import sys
 import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
 
-URL = (
-    "https://www.fpb.pt/calendario/clube_9/"
-    "?clube=9&epoca=2026/2027&genero=masculino&escalao=S%C3%A9nior&"
-)
+BASE_URL = "https://www.fpb.pt/calendario/clube_9/"
 AJAX_URL = "https://www.fpb.pt/wp-admin/admin-ajax.php"
-SEASON_END = date(2027, 7, 31)
+# FPB names seasons after their starting year ("2026/2027") and a season runs
+# from 1 August to 31 July, so the label is derived from the day we run.
+SEASON_START_MONTH = 8
+SEASON_END_MONTH = 7
+SEASON_END_DAY = 31
 # The calendar is not paginated: the initial HTML only covers ~28 days and the
 # rest is appended by AJAX in 30-day windows as you scroll. Crawl those windows.
 WINDOW_DAYS = 30
@@ -47,6 +49,33 @@ def parse_date(text):
     if mon is None:
         return None
     return date(year, mon, day)
+
+
+def season_for(day):
+    """Return (epoca, last_day) for the season that contains `day`.
+
+    A season runs 1 August - 31 July and is named after its starting year:
+    2026-08-01..2027-07-31 is "2026/2027".
+    """
+    start_year = day.year if day.month >= SEASON_START_MONTH else day.year - 1
+    return (
+        f"{start_year}/{start_year + 1}",
+        date(start_year + 1, SEASON_END_MONTH, SEASON_END_DAY),
+    )
+
+
+def calendar_params(epoca):
+    return {
+        "clube": "9",
+        "epoca": epoca,
+        "genero": "masculino",
+        "escalao": "Sénior",
+    }
+
+
+def calendar_url(epoca):
+    # Keep the season slash readable; requests encodes the rest (e.g. Sénior).
+    return f"{BASE_URL}?{urlencode(calendar_params(epoca), safe='/')}"
 
 
 def fetch(session, url, params=None):
@@ -123,17 +152,14 @@ def parse_events(html, seen_uids, skipped):
     return events
 
 
-def load_more(session, start, end):
-    params = {
+def load_more(session, epoca, start, end):
+    params = calendar_params(epoca)
+    params.update({
         "action": "get_more_days",
-        "clube": "9",
-        "epoca": "2026/2027",
-        "escalao": "Sénior",
-        "genero": "masculino",
         "period[time_option]": "loadmore",
         "period[from_date]": start.isoformat(),
         "period[to_date]": end.isoformat(),
-    }
+    })
     obj = fetch(session, AJAX_URL, params).json()
     result = obj.get("result") or ""
     if isinstance(result, list):
@@ -141,7 +167,10 @@ def load_more(session, start, end):
     return result, bool(obj.get("hasmore"))
 
 
-def scrape():
+def scrape(today=None):
+    today = today or date.today()
+    epoca, season_end = season_for(today)
+
     session = requests.Session()
     session.headers.update({
         "User-Agent": USER_AGENT,
@@ -153,17 +182,17 @@ def scrape():
     skipped = [0]
 
     # First chunk: the server-rendered page (~next 28 days).
-    resp = fetch(session, URL)
+    resp = fetch(session, calendar_url(epoca))
     events.extend(parse_events(resp.text, seen_uids, skipped))
 
     # Remaining chunks: same AJAX endpoint the infinite scroll uses.
-    start = date.today() + timedelta(days=WINDOW_DAYS - 1)
+    start = today + timedelta(days=WINDOW_DAYS - 1)
     for _ in range(MAX_WINDOWS):
-        end = start + timedelta(days=WINDOW_DAYS - 1)
-        if start > SEASON_END:
+        if start > season_end:
             break
+        end = start + timedelta(days=WINDOW_DAYS - 1)
         try:
-            html, has_more = load_more(session, start, end)
+            html, has_more = load_more(session, epoca, start, end)
         except Exception as exc:
             print(f"warn: load-more failed for {start}..{end}: {exc}")
             break
@@ -335,8 +364,10 @@ def build_ics(events, existing):
 
 
 def main():
+    today = date.today()
+    epoca, _season_end = season_for(today)
     try:
-        events = scrape()
+        events = scrape(today)
     except Exception as exc:
         print(f"error: fetch/parse failed: {exc}", file=sys.stderr)
         sys.exit(1)
@@ -358,7 +389,7 @@ def main():
         META_PATH.write_text(json.dumps({
             "last_run": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "events": total,
-            "source": URL,
+            "source": calendar_url(epoca),
         }, indent=2) + "\n", encoding="utf-8")
     else:
         print(f"no change: {ICS_PATH.name} already up to date ({total} events)")
