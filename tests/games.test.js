@@ -8,6 +8,7 @@ const {
   parseDTSTART,
   lisbonDay,
   eventDay,
+  formatGameDate,
   upcomingEvents,
 } = require("../games.js");
 
@@ -161,6 +162,128 @@ test("visibility does not depend on the viewer's timezone", () => {
 
   assert.deepEqual(new Set(outputs).size, 1, `differs by timezone: ${outputs}`);
   assert.equal(outputs[0], "[1,1,0]");
+});
+
+test("game dates are English with the month spelled out", () => {
+  // Not the viewer's locale ("sábado, 24/10/2026" on a Portuguese phone) and
+  // not a numeric date: "Sat, 24 Oct 2026". `today` is passed in so the test
+  // does not depend on the day it runs.
+  const today = "2026-10-01";
+  assert.equal(
+    formatGameDate(parseDTSTART("20261024T203000"), today),
+    "Sat, 24 Oct 2026"
+  );
+  assert.equal(
+    formatGameDate(parseDTSTART("20261205"), today),
+    "Sat, 5 Dec 2026"
+  );
+  assert.equal(
+    formatGameDate(parseDTSTART("20270329T170000"), today),
+    "Mon, 29 Mar 2027"
+  );
+  assert.equal(
+    formatGameDate(parseDTSTART("20261101T160000"), today),
+    "Sun, 1 Nov 2026"
+  );
+});
+
+test("today and tomorrow are labelled instead of dated", () => {
+  assert.equal(
+    formatGameDate(parseDTSTART("20261024T203000"), "2026-10-24"),
+    "Today"
+  );
+  assert.equal(
+    formatGameDate(parseDTSTART("20261025T160000"), "2026-10-24"),
+    "Tomorrow"
+  );
+  // The day after tomorrow is a normal date again.
+  assert.equal(
+    formatGameDate(parseDTSTART("20261026T203000"), "2026-10-24"),
+    "Mon, 26 Oct 2026"
+  );
+  // Yesterday is not upcoming, but it must not be called "Today" either.
+  assert.equal(
+    formatGameDate(parseDTSTART("20261023T203000"), "2026-10-24"),
+    "Fri, 23 Oct 2026"
+  );
+});
+
+test("tomorrow rolls over months, years and DST changes", () => {
+  assert.equal(
+    formatGameDate(parseDTSTART("20261101"), "2026-10-31"),
+    "Tomorrow"
+  );
+  assert.equal(
+    formatGameDate(parseDTSTART("20270101"), "2026-12-31"),
+    "Tomorrow"
+  );
+  // DST ends on 25 Oct 2026 and starts on 28 Mar 2027; these are calendar days,
+  // so a 23/25-hour day must not shift the label.
+  assert.equal(
+    formatGameDate(parseDTSTART("20261025T203000"), "2026-10-24"),
+    "Tomorrow"
+  );
+  assert.equal(
+    formatGameDate(parseDTSTART("20270329T203000"), "2027-03-28"),
+    "Tomorrow"
+  );
+});
+
+test("the date shown does not depend on the viewer's timezone", () => {
+  const script = `
+    const { parseDTSTART, formatGameDate } = require(${JSON.stringify(GAMES_JS)});
+    console.log(formatGameDate(parseDTSTART("20261024T203000"), "2026-10-01"));
+  `;
+
+  const outputs = [
+    "Pacific/Kiritimati",
+    "America/Los_Angeles",
+    "Europe/Lisbon",
+    "UTC",
+  ].map((tz) =>
+    execFileSync(process.execPath, ["-e", script], {
+      env: { ...process.env, TZ: tz },
+    })
+      .toString()
+      .trim()
+  );
+
+  assert.deepEqual(new Set(outputs), new Set(["Sat, 24 Oct 2026"]));
+});
+
+test("today and tomorrow follow the Lisbon calendar, not the viewer's", () => {
+  // 22:30 UTC on 24 Oct is still the 24th in Lisbon (UTC+1) but already the
+  // 25th in Kiritimati (UTC+14). The game on the 24th is still "Today": the
+  // page's day boundary is Lisbon's, like the rest of its date logic.
+  const script = `
+    const {
+      parseDTSTART, lisbonDay, formatGameDate,
+    } = require(${JSON.stringify(GAMES_JS)});
+    const today = lisbonDay(new Date("2026-10-24T22:30:00Z"));
+    console.log(JSON.stringify([
+      today,
+      formatGameDate(parseDTSTART("20261024T203000"), today),
+      formatGameDate(parseDTSTART("20261025T160000"), today),
+    ]));
+  `;
+
+  const outputs = [
+    "Pacific/Kiritimati",
+    "America/Los_Angeles",
+    "Europe/Lisbon",
+    "UTC",
+  ].map((tz) =>
+    execFileSync(process.execPath, ["-e", script], {
+      env: { ...process.env, TZ: tz },
+    })
+      .toString()
+      .trim()
+  );
+
+  assert.deepEqual(
+    new Set(outputs),
+    new Set([JSON.stringify(["2026-10-24", "Today", "Tomorrow"])])
+  );
 });
 
 test("upcomingEvents keeps future games and drops malformed ones", () => {

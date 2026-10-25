@@ -19,7 +19,8 @@ automatically generated from the FPB calendar page.
   forever.
 - The landing page reads the same `.ics` and keeps a game visible for its
   **whole Lisbon calendar day**, so it does not disappear while the match is
-  being played.
+  being played. Dates are English and spelled out (`Sat, 31 Oct 2026`), while
+  games **today and tomorrow** are labelled `Today` / `Tomorrow`.
 - If the FPB page changes and no valid games are found, the script **fails
   without touching** the existing `.ics` (subscribers never lose their calendar).
 - A GitHub Action runs **hourly** and only commits when the `.ics` changes.

@@ -62,6 +62,35 @@ function isPast(dt, today) {
   return eventDay(dt) < today;
 }
 
+// Landing page dates read "Sat, 24 Oct 2026": English and with the month
+// spelled out, instead of whatever the viewer's locale produces (a Portuguese
+// phone would show "sábado, 24/10/2026"). The date is a wall-clock day anchored
+// in UTC, so it has to be formatted in UTC or a viewer west of Greenwich would
+// see the day before.
+const GAME_DATE = new Intl.DateTimeFormat("en-GB", {
+  weekday: "short", day: "numeric", month: "short", year: "numeric",
+  timeZone: "UTC",
+});
+
+// "2026-10-24" -> "2026-10-25", rolling over months and years.
+function nextDay(day) {
+  const [year, month, date] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, date + 1))
+    .toISOString()
+    .slice(0, 10);
+}
+
+// A game today or tomorrow is easier to act on as "Today"/"Tomorrow" than as
+// a full date; every other day keeps the explicit date. `today` is the Lisbon
+// calendar day, the same clock the page uses to decide what is still upcoming,
+// so the label does not flip at the viewer's midnight.
+function formatGameDate(dt, today) {
+  const day = eventDay(dt);
+  if (day === today) return "Today";
+  if (day === nextDay(today)) return "Tomorrow";
+  return GAME_DATE.format(dt.date);
+}
+
 // Past games stay in the .ics (6-month retention), but the landing page only
 // shows what's still ahead. A game stays visible for its whole Lisbon calendar
 // day, so it never disappears while it is being played.
@@ -81,6 +110,7 @@ if (typeof module !== "undefined" && module.exports) {
     lisbonDay,
     eventDay,
     isPast,
+    formatGameDate,
     upcomingEvents,
   };
 }
