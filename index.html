@@ -249,6 +249,79 @@
   #games .who { font-size: .8rem; line-height: 1.35; }
   #games .meta { font-size: .65rem; color: var(--muted); line-height: 1.35; }
   #games a.game.home .meta { color: var(--home-accent); }
+  /* Glowing cards: a game today gets the animated gradient; games in the next
+     six days get a static orange glow that fades with distance (tomorrow is
+     6/7 strength, in six days 1/7; a week away is a regular card). The glow is
+     a crisp 2px edge plus a blurred halo behind the card; the card's own
+     opaque background hides the middle. */
+  #games a.game.today,
+  #games a.game.warm {
+    position: relative;
+  }
+  #games a.game.today::before,
+  #games a.game.today::after,
+  #games a.game.warm::before,
+  #games a.game.warm::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: calc(.65rem + 2px);
+    pointer-events: none;
+  }
+  #games a.game.today::before,
+  #games a.game.today::after {
+    background: linear-gradient(
+      45deg,
+      #ff595e,
+      #ffca3a,
+      #8ac926,
+      #1982c4,
+      #6a4c93,
+      #ff6700
+    );
+    background-size: 400%;
+    animation: gameGlow 20s linear infinite;
+  }
+  /* Today is deliberately louder than the static warm glow: a thicker ring,
+     a wider halo and a slow breathing pulse. */
+  #games a.game.today::before {
+    inset: -3px;
+    border-radius: calc(.65rem + 3px);
+  }
+  #games a.game.today::after {
+    inset: -6px;
+    border-radius: calc(.65rem + 6px);
+    filter: blur(24px);
+    opacity: .8;
+    animation: gameGlow 20s linear infinite, gamePulse 3.2s ease-in-out infinite;
+  }
+  #games a.game.warm::before,
+  #games a.game.warm::after {
+    background: linear-gradient(45deg, #ffb347, #ff8c00, #ff6700, #ff4500);
+    /* Set per card by games.js: 6/7 tomorrow ... 1/7 in six days. */
+    opacity: var(--glow-strength, 0);
+  }
+  #games a.game.warm::after {
+    filter: blur(18px);
+    opacity: calc(var(--glow-strength, 0) * .75);
+  }
+  /* Hovering lifts the cards with a transform, which would make the card a
+     stacking context and paint the glow above it instead of behind it. Keep
+     the other hover feedback, just skip the lift on glowing cards. */
+  #games a.game.today:hover,
+  #games a.game.warm:hover {
+    transform: none;
+  }
+  @keyframes gameGlow {
+    0% { background-position: 0 0; }
+    50% { background-position: 100% 0; }
+    100% { background-position: 0 0; }
+  }
+  @keyframes gamePulse {
+    0%, 100% { opacity: .8; }
+    50% { opacity: 1; }
+  }
   /* Phones: the date would squeeze the matchup into a narrow strip next to
      it, so the card stacks and the date/time share one line. */
   @media (max-width: 30rem) {
@@ -268,6 +341,7 @@
   @media (prefers-reduced-motion: reduce) {
     #games a.game, #games .msg, .gcal { transition: none; }
     #games a.game:hover { transform: none; }
+    #games a.game.today::before, #games a.game.today::after { animation: none; }
   }
 </style>
 </head>
@@ -413,6 +487,16 @@
       a.rel = "noopener";
       if (location) a.title = "Directions to " + location;
       if (isHome) a.classList.add("home");
+      // Today glows with the animated gradient; the next six days get a static
+      // orange glow that fades by one seventh per day.
+      const daysAway = daysUntil(dt, today);
+      const strength = glowStrength(daysAway);
+      if (daysAway === 0) {
+        a.classList.add("today");
+      } else if (strength > 0) {
+        a.classList.add("warm");
+        a.style.setProperty("--glow-strength", strength);
+      }
 
       const when = document.createElement("span");
       when.className = "when";

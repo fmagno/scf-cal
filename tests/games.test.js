@@ -8,6 +8,8 @@ const {
   parseDTSTART,
   lisbonDay,
   eventDay,
+  daysUntil,
+  glowStrength,
   formatGameDate,
   upcomingEvents,
 } = require("../games.js");
@@ -185,6 +187,34 @@ test("game dates are English with the month spelled out", () => {
     formatGameDate(parseDTSTART("20261101T160000"), today),
     "Sun, 1 Nov 2026"
   );
+});
+
+test("daysUntil counts whole Lisbon calendar days to the game", () => {
+  const today = "2026-10-24";
+  assert.equal(daysUntil(parseDTSTART("20261024T203000"), today), 0);
+  assert.equal(daysUntil(parseDTSTART("20261025T160000"), today), 1);
+  assert.equal(daysUntil(parseDTSTART("20261030T203000"), today), 6);
+  assert.equal(daysUntil(parseDTSTART("20261031T170000"), today), 7);
+  assert.equal(daysUntil(parseDTSTART("20261023T203000"), today), -1);
+  // Calendar days, not 24-hour periods: DST end/start and month/year rollovers
+  // must not produce 0 or 2.
+  assert.equal(daysUntil(parseDTSTART("20270329T203000"), "2027-03-28"), 1);
+  assert.equal(daysUntil(parseDTSTART("20261025T203000"), "2026-10-24"), 1);
+  assert.equal(daysUntil(parseDTSTART("20270101"), "2026-12-31"), 1);
+  assert.equal(daysUntil(parseDTSTART("20261101"), "2026-10-31"), 1);
+});
+
+test("the static glow fades by one seventh per day", () => {
+  assert.equal(glowStrength(1), 6 / 7);
+  assert.equal(glowStrength(2), 5 / 7);
+  assert.equal(glowStrength(3), 4 / 7);
+  assert.equal(glowStrength(4), 3 / 7);
+  assert.equal(glowStrength(5), 2 / 7);
+  assert.equal(glowStrength(6), 1 / 7);
+  // Today is animated and a week away is a regular card.
+  assert.equal(glowStrength(0), 0);
+  assert.equal(glowStrength(7), 0);
+  assert.equal(glowStrength(-1), 0);
 });
 
 test("today and tomorrow are labelled instead of dated", () => {

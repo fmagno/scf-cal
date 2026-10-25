@@ -72,12 +72,22 @@ const GAME_DATE = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
-// "2026-10-24" -> "2026-10-25", rolling over months and years.
-function nextDay(day) {
-  const [year, month, date] = day.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, date + 1))
-    .toISOString()
-    .slice(0, 10);
+// Whole Lisbon calendar days from `today` to the game: 0 is today, 1 tomorrow,
+// -1 yesterday. Both dates are YYYY-MM-DD strings, so normalising at UTC keeps
+// DST changes from producing 23/25-hour "days" and off-by-one results.
+function daysUntil(dt, today) {
+  const [ty, tm, td] = today.split("-").map(Number);
+  const [ey, em, ed] = eventDay(dt).split("-").map(Number);
+  return Math.round(
+    (Date.UTC(ey, em - 1, ed) - Date.UTC(ty, tm - 1, td)) / 86400000
+  );
+}
+
+// Static glow intensity for upcoming games: tomorrow is 6/7 of the maximum,
+// two days 5/7, ... six days 1/7. Today has its own animated glow and a game
+// a week away is a regular card, so both get 0 here.
+function glowStrength(days) {
+  return days >= 1 && days <= 6 ? (7 - days) / 7 : 0;
 }
 
 // A game today or tomorrow is easier to act on as "Today"/"Tomorrow" than as
@@ -85,9 +95,9 @@ function nextDay(day) {
 // calendar day, the same clock the page uses to decide what is still upcoming,
 // so the label does not flip at the viewer's midnight.
 function formatGameDate(dt, today) {
-  const day = eventDay(dt);
-  if (day === today) return "Today";
-  if (day === nextDay(today)) return "Tomorrow";
+  const days = daysUntil(dt, today);
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
   return GAME_DATE.format(dt.date);
 }
 
@@ -110,6 +120,8 @@ if (typeof module !== "undefined" && module.exports) {
     lisbonDay,
     eventDay,
     isPast,
+    daysUntil,
+    glowStrength,
     formatGameDate,
     upcomingEvents,
   };
