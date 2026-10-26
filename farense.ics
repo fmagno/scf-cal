@@ -105,10 +105,10 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:416339@fpb.pt
-DTSTAMP:20261024T014926Z
+DTSTAMP:20261026T203336Z
 DTSTART;TZID=Europe/Lisbon:20261209T213000
 DTEND;TZID=Europe/Lisbon:20261209T233000
-SUMMARY:Ginásio CO B vs SC Farense
+SUMMARY:Ginásio "IBÉRICAFRIO" vs SC Farense
 LOCATION:Pavilhão do Ginásio Clube Olhanense\, Olhão
 DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
  alID=416339
@@ -235,10 +235,10 @@ TRANSP:OPAQUE
 END:VEVENT
 BEGIN:VEVENT
 UID:416394@fpb.pt
-DTSTAMP:20261024T014926Z
+DTSTAMP:20261026T203336Z
 DTSTART;TZID=Europe/Lisbon:20270416T210000
 DTEND;TZID=Europe/Lisbon:20270416T230000
-SUMMARY:SC Farense vs Ginásio CO B
+SUMMARY:SC Farense vs Ginásio "IBÉRICAFRIO"
 LOCATION:Pavilhão do Sporting Clube Farense\, Faro
 DESCRIPTION:2ª Divisão Masculina\nhttps://www.fpb.pt/ficha-de-jogo?intern
  alID=416394
